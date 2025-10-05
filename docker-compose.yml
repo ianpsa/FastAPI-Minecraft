@@ -1,0 +1,46 @@
+services:
+  mc:
+    image: itzg/minecraft-server
+    tty: true
+    stdin_open: true
+    ports:
+      - "25565:25565"
+    environment:
+      EULA: "TRUE"
+      TYPE: "VANILLA"
+      VERSION: "LATEST"
+      RCON: "true"
+      RCON_PASSWORD: "minecraft"
+      MEMORY: "2G"
+      ONLINE_MODE: "FALSE"
+    volumes:
+      - ./mc_server:/data
+    container_name: mc
+
+  endpoint:
+    build:
+      context: ./components
+      dockerfile: dockerfile.api
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: ["python3", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
+    depends_on:
+      - mc
+    restart: unless-stopped
+    container_name: fastapi-mc
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./dockerfile.front
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+    command: ["npm", "run", "dev", "--", "--host"]
+    depends_on:
+      - endpoint
+    container_name: front-mc

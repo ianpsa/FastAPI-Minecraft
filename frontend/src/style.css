@@ -1,0 +1,11 @@
+@import "tailwindcss";
+@source "./index.html";
+@source "./src/**/*.{js,ts,jsx,tsx}";
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
