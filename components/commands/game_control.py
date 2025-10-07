@@ -133,9 +133,14 @@ def game_commands_routes(app):
     @app.post("/trollar", response_class=JSONResponse)
     async def troll_player(request: PlayerRequest):
         try:
+            # Teleporta o jogador
             subprocess.run(
                 ["docker", "exec", MINECRAFT_CONTAINER, "bash", "-c",
                 f'echo "tp {request.player} ~ ~100 ~" | rcon-cli'],
+                check=True
+            )
+            # Envia mensagem no chat
+            subprocess.run(
                 ["docker", "exec", MINECRAFT_CONTAINER, "bash", "-c",
                 f'echo "say {request.player} foi trollado kkkk" | rcon-cli'],
                 check=True
